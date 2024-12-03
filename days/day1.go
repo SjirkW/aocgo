@@ -9,7 +9,6 @@ import (
 	"strings"
 )
 
-// SolvePart1 solves the first part of the problem
 func Solve() int {
 	lines := utils.ReadInputAsLines(1, false)
 
@@ -18,7 +17,6 @@ func Solve() int {
 	amountMap := make(map[int]int)
 
 	for i := 0; i < len(lines); i++ {
-		// Split on space
 		numbers := strings.Fields(lines[i])
 
 		num1, err1 := strconv.Atoi(numbers[0])
