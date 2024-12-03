@@ -8,7 +8,11 @@ import (
 	"strings"
 )
 
-func day3(checkEnable bool) {
+type day3 struct {
+	result int
+}
+
+func (d *day3) run(checkEnable bool) int {
 	lines := utils.ReadInputAsLines(3, false)
 
 	total := 0
@@ -43,10 +47,15 @@ func day3(checkEnable bool) {
 		}
 	}
 
-	fmt.Printf("Total: %d\n", total)
+	return total
 }
 
 func Solve3() {
-	day3(false)
-	day3(true)
+	pt1 := day3{}
+	pt1.run(false)
+	fmt.Printf("Part 1 Result: %d\n", pt1.result)
+
+	pt2 := day3{}
+	pt2.run(true)
+	fmt.Printf("Part 2 Result: %d\n", pt2.result)
 }
