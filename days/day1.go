@@ -3,7 +3,6 @@ package days
 import (
 	"aoc/utils"
 	"fmt"
-	"log"
 	"sort"
 	"strconv"
 	"strings"
@@ -12,26 +11,17 @@ import (
 func Solve() int {
 	lines := utils.ReadInputAsLines(1, false)
 
-	var left []int
-	var right []int
+	var left, right []int
 	amountMap := make(map[int]int)
 
 	for i := 0; i < len(lines); i++ {
 		numbers := strings.Fields(lines[i])
 
-		num1, err1 := strconv.Atoi(numbers[0])
-		if err1 != nil {
-			log.Fatalf("Failed to convert %s to int: %v", numbers[0], err1)
-		}
-
-		num2, err2 := strconv.Atoi(numbers[1])
-		if err2 != nil {
-			log.Fatalf("Failed to convert %s to int: %v", numbers[1], err2)
-		}
-
+		num1, _ := strconv.Atoi(numbers[0])
 		left = append(left, num1)
-
+		num2, _ := strconv.Atoi(numbers[1])
 		right = append(right, num2)
+
 		val, ok := amountMap[num2]
 		if ok {
 			amountMap[num2] = val + 1
