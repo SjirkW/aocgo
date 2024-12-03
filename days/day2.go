@@ -17,31 +17,64 @@ func isIncreasing(numbers []int) bool {
 	return increaseCount > 1
 }
 
-func Solve2() int {
+func lineIsValid(numbers []int) bool {
+	increasing := isIncreasing(numbers)
+	for j := 0; j < len(numbers)-1; j++ {
+		diff := numbers[j+1] - numbers[j]
+		if increasing {
+			if diff < 1 || diff > 3 {
+				return false
+			}
+		} else {
+			if diff > -1 || diff < -3 {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func pt1() {
 	lines := utils.ReadInputAsLines(2, false)
 
 	valid := len(lines)
 	for i := 0; i < len(lines); i++ {
+		line := lines[i]
+		numbers := utils.StringToIntArray(line)
+		if !lineIsValid(numbers) {
+			valid--
+		}
+	}
 
-		numbers := utils.StringToIntArray(lines[i])
-		increasing := isIncreasing(numbers)
-		for j := 0; j < len(numbers)-1; j++ {
-			diff := numbers[j+1] - numbers[j]
-			if increasing {
-				if diff < 1 || diff > 3 {
-					valid--
-					break
-				}
-			} else {
-				if diff > -1 || diff < -3 {
-					valid--
+	fmt.Printf("Part 1 Result: %d\n", valid)
+}
+
+func pt2() {
+	lines := utils.ReadInputAsLines(2, false)
+
+	valid := 0
+	for i := 0; i < len(lines); i++ {
+		line := lines[i]
+		numbers := utils.StringToIntArray(line)
+		if lineIsValid(numbers) {
+			valid++
+		} else {
+			for j := 0; j < len(numbers); j++ {
+				temp := append(numbers[:j:j], numbers[j+1:]...)
+
+				if lineIsValid(temp) {
+					valid++
 					break
 				}
 			}
 		}
 	}
 
-	fmt.Printf("Part 1 Result: %d\n", valid)
+	fmt.Printf("Part 2 Result: %d\n", valid)
+}
 
-	return 1
+func Solve2() {
+	pt1()
+	pt2()
 }
