@@ -9,17 +9,14 @@ import (
 	"strings"
 )
 
-func Solve() {
-	part1Result := SolvePart1()
-	fmt.Printf("Part 1 Result: %d\n", part1Result)
-}
-
 // SolvePart1 solves the first part of the problem
-func SolvePart1() int {
+func Solve() int {
 	lines := utils.ReadInputAsLines(1, false)
 
 	var left []int
 	var right []int
+	amountMap := make(map[int]int)
+
 	for i := 0; i < len(lines); i++ {
 		// Split on space
 		numbers := strings.Fields(lines[i])
@@ -35,7 +32,14 @@ func SolvePart1() int {
 		}
 
 		left = append(left, num1)
+
 		right = append(right, num2)
+		val, ok := amountMap[num2]
+		if ok {
+			amountMap[num2] = val + 1
+		} else {
+			amountMap[num2] = 1
+		}
 	}
 
 	sort.Ints(left)
@@ -45,6 +49,18 @@ func SolvePart1() int {
 	for i := 0; i < len(left); i++ {
 		total += utils.Abs(left[i] - right[i])
 	}
+
+	fmt.Printf("Part 1 Result: %d\n", total)
+
+	total2 := 0
+	for i := 0; i < len(left); i++ {
+		val, ok := amountMap[left[i]]
+		if ok {
+			total2 += left[i] * val
+		}
+	}
+
+	fmt.Printf("Part 2 Result: %d\n", total2)
 
 	return total
 }
