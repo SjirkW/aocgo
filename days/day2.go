@@ -35,32 +35,16 @@ func lineIsValid(numbers []int) bool {
 	return true
 }
 
-func pt1() {
-	lines := utils.ReadInputAsLines(2, false)
-
-	valid := len(lines)
-	for i := 0; i < len(lines); i++ {
-		line := lines[i]
-		numbers := utils.StringToIntArray(line)
-		if !lineIsValid(numbers) {
-			valid--
-		}
-	}
-
-	fmt.Printf("Part 1 Result: %d\n", valid)
-}
-
-func pt2() {
+func pt2(allowFaulty bool) int {
 	lines := utils.ReadInputAsLines(2, false)
 
 	valid := 0
-	for i := 0; i < len(lines); i++ {
-		line := lines[i]
+	for _, line := range lines {
 		numbers := utils.StringToIntArray(line)
 		if lineIsValid(numbers) {
 			valid++
-		} else {
-			for j := 0; j < len(numbers); j++ {
+		} else if allowFaulty {
+			for j := range numbers {
 				temp := append(numbers[:j:j], numbers[j+1:]...)
 
 				if lineIsValid(temp) {
@@ -71,10 +55,10 @@ func pt2() {
 		}
 	}
 
-	fmt.Printf("Part 2 Result: %d\n", valid)
+	return valid
 }
 
 func Solve2() {
-	pt1()
-	pt2()
+	fmt.Printf("Part 2 Result: %d\n", pt2(false))
+	fmt.Printf("Part 2 Result: %d\n", pt2(true))
 }
