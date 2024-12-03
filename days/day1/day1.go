@@ -1,4 +1,4 @@
-package days
+package day1
 
 import (
 	"aoc/utils"
@@ -9,6 +9,7 @@ import (
 )
 
 func Solve() int {
+	fmt.Println("Day 1")
 	lines := utils.ReadInputAsLines(1, false)
 
 	var left, right []int
@@ -38,7 +39,7 @@ func Solve() int {
 		total += utils.Abs(left[i] - right[i])
 	}
 
-	fmt.Printf("Part 1 Result: %d\n", total)
+	fmt.Printf("Part 1: %d\n", total)
 
 	total2 := 0
 	for i := 0; i < len(left); i++ {
@@ -48,7 +49,7 @@ func Solve() int {
 		}
 	}
 
-	fmt.Printf("Part 2 Result: %d\n", total2)
+	fmt.Printf("Part 2: %d\n", total2)
 
 	return total
 }

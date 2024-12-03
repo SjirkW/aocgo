@@ -1,4 +1,4 @@
-package days
+package day2
 
 import (
 	"aoc/utils"
@@ -58,7 +58,8 @@ func pt2(allowFaulty bool) int {
 	return valid
 }
 
-func Solve2() {
-	fmt.Printf("Part 2 Result: %d\n", pt2(false))
+func Solve() {
+	fmt.Println("\nDay 2")
+	fmt.Printf("Part 1 Result: %d\n", pt2(false))
 	fmt.Printf("Part 2 Result: %d\n", pt2(true))
 }

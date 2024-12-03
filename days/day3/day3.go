@@ -1,4 +1,4 @@
-package days
+package day3
 
 import (
 	"aoc/utils"
@@ -8,11 +8,7 @@ import (
 	"strings"
 )
 
-type day3 struct {
-	result int
-}
-
-func (d *day3) run(checkEnable bool) int {
+func run(checkEnable bool) int {
 	lines := utils.ReadInputAsLines(3, false)
 
 	total := 0
@@ -50,12 +46,8 @@ func (d *day3) run(checkEnable bool) int {
 	return total
 }
 
-func Solve3() {
-	pt1 := day3{}
-	pt1.run(false)
-	fmt.Printf("Part 1 Result: %d\n", pt1.result)
-
-	pt2 := day3{}
-	pt2.run(true)
-	fmt.Printf("Part 2 Result: %d\n", pt2.result)
+func Solve() {
+	fmt.Println("\nDay 3")
+	fmt.Printf("Part 1: %d\n", run(false))
+	fmt.Printf("Part 2: %d\n", run(true))
 }
