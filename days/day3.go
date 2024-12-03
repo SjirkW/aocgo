@@ -18,22 +18,23 @@ func day3(checkEnable bool) {
 		rightSide := line
 
 		for len(rightSide) > 0 {
-			char := rightSide[0]
+			leftSide += string(rightSide[0])
 			rightSide = rightSide[1:]
-			leftSide += string(char)
 
-			if strings.HasSuffix(leftSide, "do()") {
-				enabled = true
-			} else if checkEnable && strings.HasSuffix(leftSide, "don't()") {
-				enabled = false
+			if checkEnable {
+				if strings.HasSuffix(leftSide, "do()") {
+					enabled = true
+				} else if strings.HasSuffix(leftSide, "don't()") {
+					enabled = false
+				}
 			}
 
-			if strings.HasSuffix(leftSide, "mul") {
+			if enabled && strings.HasSuffix(leftSide, "mul") {
 				re := regexp.MustCompile(`\((\d+),(\d+)\)`)
 				matches := re.FindStringSubmatch(rightSide)
-				ix := re.FindStringSubmatchIndex(rightSide)
+				matchIsAtStart := re.FindStringSubmatchIndex(rightSide)[0] == 0
 
-				if len(matches) > 2 && enabled && ix[0] == 0 {
+				if matchIsAtStart && len(matches) > 2 {
 					x, _ := strconv.Atoi(matches[1])
 					y, _ := strconv.Atoi(matches[2])
 					total += x * y

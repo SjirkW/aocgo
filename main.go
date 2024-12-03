@@ -6,5 +6,5 @@ import (
 
 func main() {
 	// day1.Solve()
-	days.Solve2()
+	days.Solve3()
 }
