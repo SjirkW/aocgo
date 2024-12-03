@@ -12,9 +12,9 @@ import (
 func ReadInputAsLines(day int, isTest bool) []string {
 	path := ""
 	if isTest {
-		path = fmt.Sprintf("tests/day%d.txt", day)
+		path = fmt.Sprintf("test/day%d.txt", day)
 	} else {
-		path = fmt.Sprintf("inputs/day%d.txt", day)
+		path = fmt.Sprintf("input/day%d.txt", day)
 	}
 
 	file, err := os.Open(path)
