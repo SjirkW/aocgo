@@ -1,9 +1,10 @@
 package main
 
 import (
-	"aoc/days/day1"
+	days "aoc/days"
 )
 
 func main() {
-	day1.Solve()
+	// day1.Solve()
+	days.Solve2()
 }
