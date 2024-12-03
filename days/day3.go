@@ -48,5 +48,4 @@ func day3(checkEnable bool) {
 func Solve3() {
 	day3(false)
 	day3(true)
-	// pt2()
 }
