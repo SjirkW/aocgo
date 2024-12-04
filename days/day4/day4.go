@@ -6,85 +6,61 @@ import (
 	"strings"
 )
 
-func findStringInDirection(stringToFind string, input [][]string, x int, y int, dx int, dy int) bool {
+func find(stringToFind string, input [][]string, x int, y int, dx int, dy int) bool {
 	strinCharArr := strings.Split(stringToFind, "")
 
-	l := len(strinCharArr)
-	ixl := l - 1
-	// Check if the string can fit in the direction
-	if x+ixl*dx >= len(input) ||
-		x+ixl*dx < 0 ||
-		y+ixl*dy >= len(input[0]) ||
-		y+ixl*dy < 0 {
-		return false
-	}
-
-	// Check if the string is in the direction
 	for i := 0; i < len(strinCharArr); i++ {
 		horizontalIx := x + i*dx
 		verticalIx := y + i*dy
-
+		// Bounds check
 		if horizontalIx < 0 || horizontalIx >= len(input) {
-			fmt.Println("Out of bounds horizontal", x, dx, dy, i, len(input), len(input[0]))
 			return false
 		}
-
 		if verticalIx < 0 || verticalIx >= len(input[0]) {
-			fmt.Println("Out of bounds vertical", y, dy, i, len(input), len(input[0]))
 			return false
 		}
 
 		if input[horizontalIx][verticalIx] != strinCharArr[i] {
 			return false
 		}
-
 	}
 
 	return true
 }
 
 func findStringInAllDirections(stringToFind string, input [][]string, x int, y int) int {
-	// Check all directions
+	directions := []int{-1, 0, 1}
+
 	total := 0
-	if findStringInDirection(stringToFind, input, x, y, 0, 1) {
-		total++
-	}
+	for _, dx := range directions {
+		for _, dy := range directions {
+			if dx == 0 && dy == 0 {
+				continue
+			}
 
-	if findStringInDirection(stringToFind, input, x, y, 1, 0) {
-		total++
-	}
-
-	if findStringInDirection(stringToFind, input, x, y, 1, 1) {
-		total++
-	}
-
-	if findStringInDirection(stringToFind, input, x, y, 1, -1) {
-		total++
-	}
-
-	if findStringInDirection(stringToFind, input, x, y, 0, -1) {
-		total++
-	}
-
-	if findStringInDirection(stringToFind, input, x, y, -1, 0) {
-		total++
-	}
-
-	if findStringInDirection(stringToFind, input, x, y, -1, 1) {
-		total++
-	}
-
-	if findStringInDirection(stringToFind, input, x, y, -1, -1) {
-		total++
+			if find(stringToFind, input, x, y, dx, dy) {
+				total++
+			}
+		}
 	}
 
 	return total
 }
 
+func findStringInAllDirections2(input [][]string, x int, y int) int {
+	if (find("MAS", input, x-1, y-1, 1, 1) ||
+		find("SAM", input, x-1, y-1, 1, 1)) &&
+		(find("MAS", input, x-1, y+1, 1, -1) ||
+			find("SAM", input, x-1, y+1, 1, -1)) {
+		return 1
+	}
+
+	return 0
+}
+
 func Solve() {
 	lines := utils.ReadInputAsLines(4, false)
 
-	// Create a multideimensional array
 	var arr [][]string
 	for _, line := range lines {
 		arr = append(arr, strings.Split(line, ""))
@@ -96,11 +72,19 @@ func Solve() {
 			if col == "X" {
 				total += findStringInAllDirections("XMAS", arr, i, j)
 			}
-			// fmt.Print(col)
 		}
-		// fmt.Println()
 	}
 
 	fmt.Println("Part 1:", total)
-	// fmt.Println("\nDay 4", arr)
+
+	total2 := 0
+	for i, row := range arr {
+		for j, col := range row {
+			if col == "A" {
+				total2 += findStringInAllDirections2(arr, i, j)
+			}
+		}
+	}
+
+	fmt.Println("Part 2:", total2)
 }
