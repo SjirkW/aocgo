@@ -40,7 +40,7 @@ func pt2(allowFaulty bool) int {
 
 	valid := 0
 	for _, line := range lines {
-		numbers := utils.StringToIntArray(line)
+		numbers := utils.StringToIntArray(line, " ")
 		if lineIsValid(numbers) {
 			valid++
 		} else if allowFaulty {

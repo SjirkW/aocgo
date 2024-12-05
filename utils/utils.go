@@ -35,6 +35,11 @@ func ReadInputAsLines(day int, isTest bool) []string {
 	return lines
 }
 
+func StringToInt(s string) int {
+	num, _ := strconv.Atoi(s)
+	return num
+}
+
 func Abs(x int) int {
 	if x < 0 {
 		return 0 - x
@@ -42,9 +47,9 @@ func Abs(x int) int {
 	return x - 0
 }
 
-func StringToIntArray(input string) []int {
+func StringToIntArray(input string, splitChar string) []int {
 	// Split the string on spaces
-	strValues := strings.Split(input, " ")
+	strValues := strings.Split(input, splitChar)
 
 	// Convert each string to an integer
 	intValues := make([]int, len(strValues))
