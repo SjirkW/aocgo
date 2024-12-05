@@ -51,7 +51,7 @@ func Solve() {
 		}
 	}
 
-	fmt.Println("Day 5")
+	fmt.Println("\nDay 5")
 	fmt.Printf("Part 1: %d\n", totalPt1)
 	fmt.Printf("Part 2: %d\n", totalPt2)
 }

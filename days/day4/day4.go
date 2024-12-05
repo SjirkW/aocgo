@@ -75,6 +75,7 @@ func Solve() {
 		}
 	}
 
+	fmt.Println("\nDay 4")
 	fmt.Println("Part 1:", total)
 
 	total2 := 0
