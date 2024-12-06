@@ -1,6 +1,8 @@
 package main
 
-import "aoc/days/day6"
+import (
+	"aoc/days/day6"
+)
 
 func main() {
 	// start := time.Now()
