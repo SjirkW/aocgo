@@ -47,6 +47,17 @@ func Abs(x int) int {
 	return x - 0
 }
 
+func PrintGrid(grid [][]string) {
+	fmt.Println()
+	for _, row := range grid {
+		for _, col := range row {
+			fmt.Print(col)
+		}
+		fmt.Println()
+	}
+	fmt.Println()
+}
+
 func StringToIntArray(input string, splitChar string) []int {
 	// Split the string on spaces
 	strValues := strings.Split(input, splitChar)

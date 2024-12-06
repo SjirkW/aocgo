@@ -1,23 +1,16 @@
 package main
 
-import (
-	"aoc/days/day1"
-	"aoc/days/day2"
-	"aoc/days/day3"
-	"aoc/days/day4"
-	"aoc/days/day5"
-	"fmt"
-	"time"
-)
+import "aoc/days/day6"
 
 func main() {
-	start := time.Now()
+	// start := time.Now()
 
-	day1.Solve()
-	day2.Solve()
-	day3.Solve()
-	day4.Solve()
-	day5.Solve()
+	// day1.Solve()
+	// day2.Solve()
+	// day3.Solve()
+	// day4.Solve()
+	// day5.Solve()
+	day6.Solve()
 
-	fmt.Printf("Execution time: %v\n", time.Since(start))
+	// fmt.Printf("Execution time: %v\n", time.Since(start))
 }
