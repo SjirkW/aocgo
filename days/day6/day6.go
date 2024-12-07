@@ -3,8 +3,10 @@ package day6
 import (
 	"aoc/utils"
 	"fmt"
-	"strconv"
+	"runtime"
 	"strings"
+	"sync"
+	"sync/atomic"
 )
 
 var directions = [][]int{
@@ -22,7 +24,7 @@ type GridData struct {
 	obstacles map[string]int
 }
 
-func traverseGrid(gridData GridData, pt1 bool, dir int, start []int) bool {
+func traverseGrid(gridData *GridData, pt1 bool, dir int, start []int, obstacle []int) bool {
 	x := start[0]
 	y := start[1]
 	direction := dir
@@ -48,12 +50,13 @@ func traverseGrid(gridData GridData, pt1 bool, dir int, start []int) bool {
 		}
 
 		next := grid[nextY][nextX]
-		if next == "." || next == "^" || next == "X" {
+		isObstacle := obstacle[0] == nextX && obstacle[1] == nextY
+		if !isObstacle && (next == "." || next == "^" || next == "X") {
 			x = nextX
 			y = nextY
 
 			if !pt1 {
-				visitedKey := strconv.Itoa(x) + "," + strconv.Itoa(y) + "," + strconv.Itoa(dx) + "," + strconv.Itoa(dy)
+				visitedKey := fmt.Sprintf("%d,%d,%d,%d", x, y, dx, dy)
 				if visited[visitedKey] {
 					return true
 				}
@@ -62,27 +65,37 @@ func traverseGrid(gridData GridData, pt1 bool, dir int, start []int) bool {
 				score++
 				grid[nextY][nextX] = "X"
 			}
-		} else if next == "#" {
+		} else if next == "#" || isObstacle {
 			direction = (direction + 1) % len(directions)
 		}
 	}
 	return false
 }
 
-func part2(gridData GridData, start []int) {
-	loop := 0
+func part2(gridData *GridData, start []int) {
+	var loop int32
+	var wg sync.WaitGroup
+	semaphore := make(chan struct{}, runtime.NumCPU())
+
 	for i := 0; i < len(gridData.grid); i++ {
 		for j := 0; j < len(gridData.grid[i]); j++ {
 			if gridData.grid[i][j] == "X" {
-				gridData.grid[i][j] = "#"
-				if traverseGrid(gridData, false, 0, start) {
-					loop++
-				}
-				gridData.grid[i][j] = "X"
+				wg.Add(1)
+				semaphore <- struct{}{}
+
+				go func(x, y int) {
+					defer wg.Done()
+					defer func() { <-semaphore }()
+
+					if traverseGrid(gridData, false, 0, start, []int{x, y}) {
+						atomic.AddInt32(&loop, 1)
+					}
+				}(j, i)
 			}
 		}
 	}
 
+	wg.Wait()
 	fmt.Println("Part 2:", loop)
 }
 
@@ -108,10 +121,11 @@ func Solve() {
 		grid:      grid,
 		position:  start,
 		direction: directions[0],
-		score:     0,
+		score:     1,
 		obstacles: make(map[string]int),
 	}
 
-	traverseGrid(gridData, true, 0, start)
-	part2(gridData, start)
+	traverseGrid(&gridData, true, 0, start, []int{-1, -1})
+	// Use the result from part 1 to solve part 2
+	part2(&gridData, start)
 }
