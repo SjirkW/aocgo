@@ -1,7 +1,7 @@
 package main
 
 import (
-	"aoc/days/day6"
+	"aoc/days/day7"
 	"fmt"
 	"time"
 )
@@ -14,7 +14,8 @@ func main() {
 	// day3.Solve()
 	// day4.Solve()
 	// day5.Solve()
-	day6.Solve()
+	// day6.Solve()
+	day7.Solve()
 
 	fmt.Printf("Execution time: %v\n", time.Since(start))
 }
