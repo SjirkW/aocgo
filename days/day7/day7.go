@@ -3,11 +3,12 @@ package day7
 import (
 	"aoc/utils"
 	"fmt"
+	"math"
 	"strings"
 )
 
-func part1(lines []string) int {
-	return 0
+func concatInts(a, b int) int {
+	return a*int(math.Pow(10, math.Floor(math.Log10(float64(b))+1))) + b
 }
 
 func hasResult(result int, current int, numbers []int) bool {
@@ -15,6 +16,8 @@ func hasResult(result int, current int, numbers []int) bool {
 		if current+numbers[0] == result {
 			return true
 		} else if current*numbers[0] == result {
+			return true
+		} else if concatInts(current, numbers[0]) == result {
 			return true
 		} else {
 			return false
@@ -26,6 +29,8 @@ func hasResult(result int, current int, numbers []int) bool {
 	if hasResult(result, current+left, rest) {
 		return true
 	} else if hasResult(result, current*left, rest) {
+		return true
+	} else if hasResult(result, concatInts(current, left), rest) {
 		return true
 	}
 
@@ -54,5 +59,6 @@ func Solve() {
 	}
 	fmt.Println(r)
 
+	// fmt.Println(concatInts(1122, 322))
 	// fmt.Println("Part 1:", part1(lines))
 }
