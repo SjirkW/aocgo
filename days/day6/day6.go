@@ -34,81 +34,81 @@ func indexOfDirection(direction []int, directions [][]int) int {
 }
 
 func traverseGrid(gridData GridData, pt1 bool) bool {
-	stack := []GridData{gridData}
-	visited := make(map[string]bool)
+	x := gridData.position[0]
+	y := gridData.position[1]
+	direction := gridData.direction
+	previous := []int{x, y}
+	grid := gridData.grid
+	checkLoop := gridData.loopCheck
+	score := gridData.score
+	next := true
 
-	for len(stack) > 0 {
-		current := stack[len(stack)-1]
-		stack = stack[:len(stack)-1]
-
-		x := current.position[0]
-		y := current.position[1]
-		grid := current.grid
-		direction := current.direction
-
-		// Create a key to track visited positions
-		posKey := fmt.Sprintf("%d,%d,%d,%d", x, y, direction[0], direction[1])
-
-		// Skip if this exact position and direction has been visited
-		if visited[posKey] {
-			continue
-		}
-		visited[posKey] = true
-
-		// Calculate next position
+	for next {
+		previous = []int{x, y}
 		horizontalIx := x + direction[0]
 		verticalIx := y + direction[1]
-
-		// Check bounds
-		if horizontalIx < 0 || horizontalIx >= len(grid[0]) ||
-			verticalIx < 0 || verticalIx >= len(grid) {
-			fmt.Println("Out of bounds", gridData.score)
-			continue
+		if horizontalIx < 0 || horizontalIx >= len(grid) {
+			// utils.PrintGrid(grid)
+			fmt.Println("Out of bounds", score)
+			next = false
+			return false
+		}
+		if verticalIx < 0 || verticalIx >= len(grid[0]) {
+			// utils.PrintGrid(grid)
+			next = false
+			fmt.Println("Out of bounds", score)
+			return false
 		}
 
 		next := grid[verticalIx][horizontalIx]
-
-		// Different handling based on the cell type
-		switch next {
-		case "0":
-			// Loop detected
+		if next == "0" {
+			// fmt.Println("Loop")
 			return true
-		case ".", "^", "X":
-			// Move forward
-			newGridData := current
-			newGridData.position = []int{horizontalIx, verticalIx}
+		} else if next == "." || next == "^" || next == "X" {
+			x = horizontalIx
+			y = verticalIx
 
 			if pt1 {
 				if next != "X" {
-					newGridData.score++
-					newGridData.grid[verticalIx][horizontalIx] = "X"
+					score++
+					grid[verticalIx][horizontalIx] = "X"
 				}
-			} else {
-				// Loop checking logic
-				xs := strconv.Itoa(newGridData.position[0])
-				ys := strconv.Itoa(newGridData.position[1])
+			} else if checkLoop {
+				xs := strconv.Itoa(gridData.position[0])
+				ys := strconv.Itoa(gridData.position[1])
 				key := xs + "," + ys
 
-				if newGridData.obstacles[key] != 1 {
-					// Try turning
-					for _, newDir := range directions {
-						tryGridData := newGridData
-						tryGridData.direction = newDir
-						stack = append(stack, tryGridData)
+				hasObstacle := gridData.obstacles[key] == 1
+				if !hasObstacle {
+					prev := grid[verticalIx][horizontalIx]
+					prevDirection := []int{gridData.direction[0], gridData.direction[1]}
+
+					gridData.loopCheck = false
+					gridData.grid[verticalIx][horizontalIx] = "0"
+					gridData.position = []int{x, y}
+					gridData.direction = directions[(indexOfDirection(direction, directions)+1)%len(directions)]
+
+					if traverseGrid(gridData, pt1) {
+						gridData.obstacles[key] = 1
+						gridData.loopScore++
+						// fmt.Print(gridData.loopScore)
+						// utils.PrintGrid(grid)
 					}
+
+					gridData.loopCheck = true
+					gridData.grid[verticalIx][horizontalIx] = prev
+					gridData.position = []int{horizontalIx, verticalIx}
+					gridData.direction = prevDirection
 				}
 			}
 
-			stack = append(stack, newGridData)
-
-		case "#":
-			// Turn when hitting an obstacle
-			newGridData := current
-			newGridData.direction = directions[(indexOfDirection(direction, directions)+1)%len(directions)]
-			stack = append(stack, newGridData)
+			// return traverseGrid(gridData, pt1)
+		} else if next == "#" {
+			direction = directions[(indexOfDirection(direction, directions)+1)%len(directions)]
+			x = previous[0]
+			y = previous[1]
 		}
 	}
-
 	return false
 }
 
