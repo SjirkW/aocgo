@@ -54,7 +54,8 @@ func Solve() {
 	for i := 0; i < len(left); i++ {
 		if hasResult(left[i], 0, right[i], false) {
 			pt1 += left[i]
-		} else if hasResult(left[i], 0, right[i], true) {
+		}
+		if hasResult(left[i], 0, right[i], true) {
 			pt2 += left[i]
 		}
 	}
