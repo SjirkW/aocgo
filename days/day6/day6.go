@@ -22,51 +22,7 @@ type GridData struct {
 	obstacles map[string]int
 }
 
-func indexOfDirection(direction []int, directions [][]int) int {
-	for i, dir := range directions {
-		if dir[0] == direction[0] && dir[1] == direction[1] {
-			return i
-		}
-	}
-	return -1
-}
-
-func checkLoop(gridData GridData, dir []int, start []int) bool {
-	x := start[0]
-	y := start[1]
-	direction := dir
-	grid := gridData.grid
-	next := true
-	visited := make(map[string]bool)
-
-	for next {
-
-		nextX := x + direction[0]
-		nextY := y + direction[1]
-
-		if (nextX < 0 || nextX >= len(grid)) ||
-			(nextY < 0 || nextY >= len(grid[0])) {
-			return false
-		}
-
-		next := grid[nextY][nextX]
-		if next == "#" || next == "0" {
-			direction = directions[(indexOfDirection(direction, directions)+1)%len(directions)]
-		} else if next == "." || next == "^" {
-			visitedKey := strconv.Itoa(x) + "," + strconv.Itoa(y) + "," + strconv.Itoa(direction[0]) + "," + strconv.Itoa(direction[1])
-			if visited[visitedKey] {
-				return true
-			}
-			visited[visitedKey] = true
-
-			x = nextX
-			y = nextY
-		}
-	}
-	return false
-}
-
-func traverseGrid(gridData GridData, pt1 bool, dir []int, start []int) bool {
+func traverseGrid(gridData GridData, pt1 bool, dir int, start []int) bool {
 	x := start[0]
 	y := start[1]
 	direction := dir
@@ -74,11 +30,14 @@ func traverseGrid(gridData GridData, pt1 bool, dir []int, start []int) bool {
 	score := gridData.score
 	next := true
 	counter := 0
+	visited := make(map[string]bool)
 
 	for next {
 		counter++
-		nextX := x + direction[0]
-		nextY := y + direction[1]
+		dx := directions[direction][0]
+		dy := directions[direction][1]
+		nextX := x + dx
+		nextY := y + dy
 
 		if (nextX < 0 || nextX >= len(grid)) ||
 			(nextY < 0 || nextY >= len(grid[0])) {
@@ -90,33 +49,41 @@ func traverseGrid(gridData GridData, pt1 bool, dir []int, start []int) bool {
 
 		next := grid[nextY][nextX]
 		if next == "." || next == "^" || next == "X" {
-			if pt1 {
-				x = nextX
-				y = nextY
-				if next != "X" {
-					score++
-					grid[nextY][nextX] = "X"
-				}
-			} else if counter > 0 {
-				obstacleKey := strconv.Itoa(nextX) + "," + strconv.Itoa(nextY)
-				// If the obstacle is not already in the map
-				if gridData.obstacles[obstacleKey] != 1 {
-					gridData.grid[nextY][nextX] = "0"
-					if checkLoop(gridData, direction, []int{x, y}) {
-						gridData.obstacles[obstacleKey] = 1
-					}
-					gridData.grid[nextY][nextX] = "."
-				}
+			x = nextX
+			y = nextY
 
-				x = nextX
-				y = nextY
+			if !pt1 {
+				visitedKey := strconv.Itoa(x) + "," + strconv.Itoa(y) + "," + strconv.Itoa(dx) + "," + strconv.Itoa(dy)
+				if visited[visitedKey] {
+					return true
+				}
+				visited[visitedKey] = true
+			} else if next != "X" {
+				score++
+				grid[nextY][nextX] = "X"
 			}
-
 		} else if next == "#" {
-			direction = directions[(indexOfDirection(direction, directions)+1)%len(directions)]
+			direction = (direction + 1) % len(directions)
 		}
 	}
 	return false
+}
+
+func part2(gridData GridData, start []int) {
+	loop := 0
+	for i := 0; i < len(gridData.grid); i++ {
+		for j := 0; j < len(gridData.grid[i]); j++ {
+			if gridData.grid[i][j] == "X" {
+				gridData.grid[i][j] = "#"
+				if traverseGrid(gridData, false, 0, start) {
+					loop++
+				}
+				gridData.grid[i][j] = "X"
+			}
+		}
+	}
+
+	fmt.Println("Part 2:", loop)
 }
 
 func Solve() {
@@ -145,7 +112,6 @@ func Solve() {
 		obstacles: make(map[string]int),
 	}
 
-	// traverseGrid(gridData, true, directions[0], start)
-	traverseGrid(gridData, false, directions[0], start)
-	fmt.Println("Part 2:", len(gridData.obstacles))
+	traverseGrid(gridData, true, 0, start)
+	part2(gridData, start)
 }
