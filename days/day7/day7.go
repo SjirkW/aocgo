@@ -11,26 +11,18 @@ func concatInts(a, b int) int {
 	return a*int(math.Pow(10, math.Floor(math.Log10(float64(b))+1))) + b
 }
 
-func hasResult(result int, current int, numbers []int) bool {
-	if len(numbers) == 1 {
-		if current+numbers[0] == result {
-			return true
-		} else if current*numbers[0] == result {
-			return true
-		} else if concatInts(current, numbers[0]) == result {
-			return true
-		} else {
-			return false
-		}
+func hasResult(result int, current int, numbers []int, concat bool) bool {
+	if len(numbers) == 0 {
+		return current == result
 	}
 
 	left := numbers[0]
 	rest := numbers[1:]
-	if hasResult(result, current+left, rest) {
+	if hasResult(result, current+left, rest, concat) {
 		return true
-	} else if hasResult(result, current*left, rest) {
+	} else if hasResult(result, current*left, rest, concat) {
 		return true
-	} else if hasResult(result, concatInts(current, left), rest) {
+	} else if concat && hasResult(result, concatInts(current, left), rest, concat) {
 		return true
 	}
 
@@ -42,8 +34,6 @@ func Solve() {
 
 	var left []int
 	var right [][]int
-
-	// Line looks like "190: 10 19"
 	for _, line := range lines {
 		split := strings.Split(line, ": ")
 
@@ -51,14 +41,17 @@ func Solve() {
 		right = append(right, utils.StringToIntArray(split[1], " "))
 	}
 
-	r := 0
+	pt1 := 0
+	pt2 := 0
 	for i := 0; i < len(left); i++ {
-		if hasResult(left[i], 0, right[i]) {
-			r += left[i]
+		if hasResult(left[i], 0, right[i], false) {
+			pt1 += left[i]
+		}
+		if hasResult(left[i], 0, right[i], true) {
+			pt2 += left[i]
 		}
 	}
-	fmt.Println(r)
 
-	// fmt.Println(concatInts(1122, 322))
-	// fmt.Println("Part 1:", part1(lines))
+	fmt.Println("Part 1:", pt1)
+	fmt.Println("Part 2:", pt2)
 }
