@@ -23,11 +23,11 @@ func nodeInBounds(node []int, grid [][]string) bool {
 	return node[0] >= 0 && node[0] < len(grid[0]) && node[1] >= 0 && node[1] < len(grid)
 }
 
-func getNodeCoords(grid [][]string, antiNodePositions map[string]int, node1 []int, node2 []int, doSingle bool, key string) {
-	n1X := node1[0]
-	n1Y := node1[1]
-	n2X := node2[0]
-	n2Y := node2[1]
+func getNodeCoords(grid [][]string, node1 []int, node2 []int, doSingle bool) map[string]int {
+	n1X, n1Y := node1[0], node1[1]
+	n2X, n2Y := node2[0], node2[1]
+
+	antiNodePositions := make(map[string]int)
 
 	dx := utils.Abs(n2X - n1X)
 	dy := utils.Abs(n2Y - n1Y)
@@ -35,8 +35,8 @@ func getNodeCoords(grid [][]string, antiNodePositions map[string]int, node1 []in
 	do := true
 	for do {
 		do = false
+		var a1X, a1Y, a2X, a2Y int
 
-		a1X, a1Y, a2X, a2Y := -1, -1, -1, -1
 		if n1X < n2X {
 			a1X = n1X - dx
 			a2X = n2X + dx
@@ -44,9 +44,6 @@ func getNodeCoords(grid [][]string, antiNodePositions map[string]int, node1 []in
 			a1X = n1X + dx
 			a2X = n2X - dx
 		}
-
-		n1X = a1X
-		n2X = a2X
 
 		if n1Y < n2Y {
 			a1Y = n1Y - dy
@@ -56,8 +53,8 @@ func getNodeCoords(grid [][]string, antiNodePositions map[string]int, node1 []in
 			a2Y = n2Y - dy
 		}
 
-		n1Y = a1Y
-		n2Y = a2Y
+		n1X, n2X = a1X, a2X
+		n1Y, n2Y = a1Y, a2Y
 
 		n1 := []int{a1X, a1Y}
 		if nodeInBounds(n1, grid) {
@@ -69,6 +66,7 @@ func getNodeCoords(grid [][]string, antiNodePositions map[string]int, node1 []in
 				}
 			}
 		}
+
 		n2 := []int{a2X, a2Y}
 		if nodeInBounds(n2, grid) {
 			positionKey := fmt.Sprintf("%d,%d", n2[0], n2[1])
@@ -80,6 +78,8 @@ func getNodeCoords(grid [][]string, antiNodePositions map[string]int, node1 []in
 			}
 		}
 	}
+
+	return antiNodePositions
 }
 
 func createAntiNodes(grid [][]string) {
@@ -93,11 +93,13 @@ func createAntiNodes(grid [][]string) {
 	}
 
 	antiNodePositions := make(map[string]int)
-	for key, letterValues := range nodeMap {
+	for _, letterValues := range nodeMap {
 		for i := 0; i < len(letterValues); i++ {
 			for j := 0; j < len(letterValues); j++ {
 				if i != j {
-					getNodeCoords(grid, antiNodePositions, letterValues[i], letterValues[j], true, key)
+					for k, v := range getNodeCoords(grid, letterValues[i], letterValues[j], true) {
+						antiNodePositions[k] = v
+					}
 				}
 			}
 		}
@@ -106,18 +108,26 @@ func createAntiNodes(grid [][]string) {
 	fmt.Println("Pt1:", len(antiNodePositions))
 
 	antiNodePositions2 := make(map[string]int)
-	for key, letterValues := range nodeMap {
+	for _, letterValues := range nodeMap {
 		for i := 0; i < len(letterValues); i++ {
 			for j := 0; j < len(letterValues); j++ {
 				if i != j {
-					getNodeCoords(grid, antiNodePositions2, letterValues[i], letterValues[j], false, key)
+					for k, v := range getNodeCoords(grid, letterValues[i], letterValues[j], false) {
+						antiNodePositions2[k] = v
+					}
 				}
 			}
 		}
 	}
 
+	for key := range antiNodePositions2 {
+		coords := strings.Split(key, ",")
+		x, y := utils.StringToInt(coords[0]), utils.StringToInt(coords[1])
+		grid[y][x] = "#"
+	}
 	nonEmpty := countNonEmptyCells(grid)
-	fmt.Println("Pt2:", len(antiNodePositions2)+nonEmpty)
+	fmt.Println("Pt2:", nonEmpty)
+	// utils.PrintGrid(grid)
 }
 
 func Solve() {
