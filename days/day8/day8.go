@@ -2,6 +2,7 @@ package day8
 
 import (
 	"aoc/utils"
+	"fmt"
 	"strings"
 )
 
@@ -38,14 +39,44 @@ func nodeInBounds(node []int, grid [][]string) bool {
 	return node[0] >= 0 && node[0] < len(grid[0]) && node[1] >= 0 && node[1] < len(grid)
 }
 
-func addNodeToGrid(grid [][]string, nodes [][]int) {
-	if nodeInBounds(nodes[0], grid) && nodeInBounds(nodes[1], grid) {
-		for _, node := range nodes {
-			if grid[node[1]][node[0]] == "." {
-				grid[node[1]][node[0]] = "#"
+func addNodeToGrid(grid [][]string, nodes [][]int, key string) int {
+	counter := 0
+	if nodeInBounds(nodes[0], grid) {
+		node := nodes[0]
+		if grid[node[1]][node[0]] != "#" && grid[node[1]][node[0]] != key {
+			grid[node[1]][node[0]] = "#"
+			counter++
+		}
+	}
+
+	if nodeInBounds(nodes[1], grid) {
+		node := nodes[1]
+		if grid[node[1]][node[0]] != "#" && grid[node[1]][node[0]] != key {
+			grid[node[1]][node[0]] = "#"
+			counter++
+		}
+	}
+
+	return counter
+}
+
+func resetGrid(grid [][]string, original [][]string) [][]string {
+	gridCopy := make([][]string, len(grid))
+	for i := range grid {
+		gridCopy[i] = make([]string, len(grid[i]))
+		copy(gridCopy[i], original[i])
+	}
+
+	// Add all "#" from grid to gridCopy
+	for y, row := range grid {
+		for x, cell := range row {
+			if cell == "#" {
+				gridCopy[y][x] = "#"
 			}
 		}
 	}
+
+	return gridCopy
 }
 
 func createAntiNodes(grid [][]string) {
@@ -59,25 +90,34 @@ func createAntiNodes(grid [][]string) {
 		}
 	}
 
+	originalGrid := resetGrid(grid, grid)
+
 	// Loop nodemap
-	for _, letterValues := range nodeMap {
+	gridWithNodes := resetGrid(grid, originalGrid)
+	count := 0
+	for key, letterValues := range nodeMap {
+		gridWithNodes = resetGrid(gridWithNodes, originalGrid)
+		fmt.Println("Key:", key)
 		for i := 0; i < len(letterValues); i++ {
 			for j := 0; j < len(letterValues); j++ {
 				if i != j {
 					coords := getNodeCoords(letterValues[i], letterValues[j])
 
-					addNodeToGrid(grid, coords)
-					utils.PrintGrid(grid)
+					count += addNodeToGrid(gridWithNodes, coords, key)
 				}
 			}
 		}
+
+		utils.PrintGrid(gridWithNodes)
 	}
 
-	utils.PrintGrid(grid)
+	fmt.Println(nodeMap)
+	fmt.Println("Count:", count)
+	// utils.PrintGrid(grid)
 }
 
 func Solve() {
-	lines := utils.ReadInputAsLines(8, true)
+	lines := utils.ReadInputAsLines(8, false)
 
 	var grid [][]string
 	for _, line := range lines {
