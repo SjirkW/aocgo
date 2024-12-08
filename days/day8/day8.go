@@ -6,9 +6,24 @@ import (
 	"strings"
 )
 
-func getNodeCoords(grid *[][]string, node1 []int, node2 []int, doSingle bool, key string) int {
-	counter := 0
+func countNonEmptyCells(grid [][]string) int {
+	count := 0
+	for _, row := range grid {
+		for _, cell := range row {
+			if cell != "." {
+				count++
+			}
+		}
+	}
 
+	return count
+}
+
+func nodeInBounds(node []int, grid [][]string) bool {
+	return node[0] >= 0 && node[0] < len(grid[0]) && node[1] >= 0 && node[1] < len(grid)
+}
+
+func getNodeCoords(grid [][]string, antiNodePositions map[string]int, node1 []int, node2 []int, doSingle bool, key string) {
 	n1X := node1[0]
 	n1Y := node1[1]
 	n2X := node2[0]
@@ -45,64 +60,29 @@ func getNodeCoords(grid *[][]string, node1 []int, node2 []int, doSingle bool, ke
 		n2Y = a2Y
 
 		n1 := []int{a1X, a1Y}
-		if nodeInBounds(n1, *grid) {
-			if (*grid)[n1[1]][n1[0]] != "#" && (*grid)[n1[1]][n1[0]] != key {
-				(*grid)[n1[1]][n1[0]] = "#"
-				counter++
-				do = true
+		if nodeInBounds(n1, grid) {
+			positionKey := fmt.Sprintf("%d,%d", n1[0], n1[1])
+			if antiNodePositions[positionKey] != 1 {
+				antiNodePositions[positionKey] = 1
+				if !doSingle {
+					do = true
+				}
 			}
 		}
 		n2 := []int{a2X, a2Y}
-		if nodeInBounds(n2, *grid) {
-			if (*grid)[n2[1]][n2[0]] != "#" && (*grid)[n2[1]][n2[0]] != key {
-				(*grid)[n2[1]][n2[0]] = "#"
-				counter++
-				do = true
+		if nodeInBounds(n2, grid) {
+			positionKey := fmt.Sprintf("%d,%d", n2[0], n2[1])
+			if antiNodePositions[positionKey] != 1 {
+				antiNodePositions[positionKey] = 1
+				if !doSingle {
+					do = true
+				}
 			}
 		}
 	}
-
-	return counter
-}
-
-func nodeInBounds(node []int, grid [][]string) bool {
-	return node[0] >= 0 && node[0] < len(grid[0]) && node[1] >= 0 && node[1] < len(grid)
-}
-
-func resetGrid(grid [][]string, original [][]string) [][]string {
-	gridCopy := make([][]string, len(grid))
-	for i := range grid {
-		gridCopy[i] = make([]string, len(grid[i]))
-		copy(gridCopy[i], original[i])
-	}
-
-	// Add all "#" from grid to gridCopy
-	for y, row := range grid {
-		for x, cell := range row {
-			if cell == "#" {
-				gridCopy[y][x] = "#"
-			}
-		}
-	}
-
-	return gridCopy
-}
-
-func countNonEmptyCells(grid [][]string) int {
-	count := 0
-	for _, row := range grid {
-		for _, cell := range row {
-			if cell != "." {
-				count++
-			}
-		}
-	}
-
-	return count
 }
 
 func createAntiNodes(grid [][]string) {
-
 	nodeMap := make(map[string][][]int)
 	for y, row := range grid {
 		for x, cell := range row {
@@ -112,31 +92,32 @@ func createAntiNodes(grid [][]string) {
 		}
 	}
 
-	originalGrid := resetGrid(grid, grid)
-
-	// Loop nodemap
-	gridWithNodes := resetGrid(grid, originalGrid)
-	count := 0
+	antiNodePositions := make(map[string]int)
 	for key, letterValues := range nodeMap {
-		gridWithNodes = resetGrid(gridWithNodes, originalGrid)
-		// fmt.Println("Key:", key)
-
 		for i := 0; i < len(letterValues); i++ {
 			for j := 0; j < len(letterValues); j++ {
 				if i != j {
-					count += getNodeCoords(&gridWithNodes, letterValues[i], letterValues[j], false, key)
+					getNodeCoords(grid, antiNodePositions, letterValues[i], letterValues[j], true, key)
 				}
 			}
 		}
-
-		// utils.PrintGrid(gridWithNodes)
 	}
 
-	// fmt.Println(nodeMap)
-	fmt.Println("Count:", count)
+	fmt.Println("Pt1:", len(antiNodePositions))
 
-	utils.PrintGrid(gridWithNodes)
-	fmt.Println(countNonEmptyCells(gridWithNodes))
+	antiNodePositions2 := make(map[string]int)
+	for key, letterValues := range nodeMap {
+		for i := 0; i < len(letterValues); i++ {
+			for j := 0; j < len(letterValues); j++ {
+				if i != j {
+					getNodeCoords(grid, antiNodePositions2, letterValues[i], letterValues[j], false, key)
+				}
+			}
+		}
+	}
+
+	nonEmpty := countNonEmptyCells(grid)
+	fmt.Println("Pt2:", len(antiNodePositions2)+nonEmpty)
 }
 
 func Solve() {
@@ -148,7 +129,4 @@ func Solve() {
 	}
 
 	createAntiNodes(grid)
-
-	// utils.PrintGrid(grid)
-	// fmt.Println("Day 8:", lines)
 }
