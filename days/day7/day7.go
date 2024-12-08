@@ -60,6 +60,7 @@ func Solve() {
 		}
 	}
 
+	fmt.Println("\nDay 7")
 	fmt.Println("Part 1:", pt1)
 	fmt.Println("Part 2:", pt2)
 }

@@ -105,7 +105,9 @@ func createAntiNodes(grid [][]string) {
 		}
 	}
 
-	fmt.Println("Pt1:", len(antiNodePositions))
+	fmt.Println("\nDay 8")
+
+	fmt.Println("Part 1:", len(antiNodePositions))
 
 	antiNodePositions2 := make(map[string]int)
 	for _, letterValues := range nodeMap {
@@ -126,7 +128,7 @@ func createAntiNodes(grid [][]string) {
 		grid[y][x] = "#"
 	}
 	nonEmpty := countNonEmptyCells(grid)
-	fmt.Println("Pt2:", nonEmpty)
+	fmt.Println("Part 2:", nonEmpty)
 	// utils.PrintGrid(grid)
 }
 
