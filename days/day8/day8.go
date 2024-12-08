@@ -19,6 +19,8 @@ func getNodeCoords(grid *[][]string, node1 []int, node2 []int, doSingle bool, ke
 
 	do := true
 	for do {
+		do = false
+
 		a1X, a1Y, a2X, a2Y := -1, -1, -1, -1
 		if n1X < n2X {
 			a1X = n1X - dx
@@ -28,6 +30,9 @@ func getNodeCoords(grid *[][]string, node1 []int, node2 []int, doSingle bool, ke
 			a2X = n2X - dx
 		}
 
+		n1X = a1X
+		n2X = a2X
+
 		if n1Y < n2Y {
 			a1Y = n1Y - dy
 			a2Y = n2Y + dy
@@ -36,11 +41,15 @@ func getNodeCoords(grid *[][]string, node1 []int, node2 []int, doSingle bool, ke
 			a2Y = n2Y - dy
 		}
 
+		n1Y = a1Y
+		n2Y = a2Y
+
 		n1 := []int{a1X, a1Y}
 		if nodeInBounds(n1, *grid) {
 			if (*grid)[n1[1]][n1[0]] != "#" && (*grid)[n1[1]][n1[0]] != key {
 				(*grid)[n1[1]][n1[0]] = "#"
 				counter++
+				do = true
 			}
 		}
 		n2 := []int{a2X, a2Y}
@@ -48,13 +57,8 @@ func getNodeCoords(grid *[][]string, node1 []int, node2 []int, doSingle bool, ke
 			if (*grid)[n2[1]][n2[0]] != "#" && (*grid)[n2[1]][n2[0]] != key {
 				(*grid)[n2[1]][n2[0]] = "#"
 				counter++
+				do = true
 			}
-		}
-
-		if doSingle {
-			do = false
-		} else {
-			do = false
 		}
 	}
 
@@ -84,6 +88,19 @@ func resetGrid(grid [][]string, original [][]string) [][]string {
 	return gridCopy
 }
 
+func countNonEmptyCells(grid [][]string) int {
+	count := 0
+	for _, row := range grid {
+		for _, cell := range row {
+			if cell != "." {
+				count++
+			}
+		}
+	}
+
+	return count
+}
+
 func createAntiNodes(grid [][]string) {
 
 	nodeMap := make(map[string][][]int)
@@ -107,7 +124,7 @@ func createAntiNodes(grid [][]string) {
 		for i := 0; i < len(letterValues); i++ {
 			for j := 0; j < len(letterValues); j++ {
 				if i != j {
-					count += getNodeCoords(&gridWithNodes, letterValues[i], letterValues[j], true, key)
+					count += getNodeCoords(&gridWithNodes, letterValues[i], letterValues[j], false, key)
 				}
 			}
 		}
@@ -117,7 +134,9 @@ func createAntiNodes(grid [][]string) {
 
 	// fmt.Println(nodeMap)
 	fmt.Println("Count:", count)
-	// utils.PrintGrid(gridWithNodes)
+
+	utils.PrintGrid(gridWithNodes)
+	fmt.Println(countNonEmptyCells(gridWithNodes))
 }
 
 func Solve() {
