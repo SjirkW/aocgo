@@ -6,7 +6,9 @@ import (
 	"strings"
 )
 
-func getNodeCoords(node1 []int, node2 []int, doSingle bool) [][]int {
+func getNodeCoords(grid *[][]string, node1 []int, node2 []int, doSingle bool, key string) int {
+	counter := 0
+
 	n1X := node1[0]
 	n1Y := node1[1]
 	n2X := node2[0]
@@ -15,7 +17,6 @@ func getNodeCoords(node1 []int, node2 []int, doSingle bool) [][]int {
 	dx := utils.Abs(n2X - n1X)
 	dy := utils.Abs(n2Y - n1Y)
 
-	var result [][]int
 	do := true
 	for do {
 		a1X, a1Y, a2X, a2Y := -1, -1, -1, -1
@@ -34,8 +35,21 @@ func getNodeCoords(node1 []int, node2 []int, doSingle bool) [][]int {
 			a1Y = n1Y + dy
 			a2Y = n2Y - dy
 		}
-		result = append(result, []int{a1X, a1Y})
-		result = append(result, []int{a2X, a2Y})
+
+		n1 := []int{a1X, a1Y}
+		if nodeInBounds(n1, *grid) {
+			if (*grid)[n1[1]][n1[0]] != "#" && (*grid)[n1[1]][n1[0]] != key {
+				(*grid)[n1[1]][n1[0]] = "#"
+				counter++
+			}
+		}
+		n2 := []int{a2X, a2Y}
+		if nodeInBounds(n2, *grid) {
+			if (*grid)[n2[1]][n2[0]] != "#" && (*grid)[n2[1]][n2[0]] != key {
+				(*grid)[n2[1]][n2[0]] = "#"
+				counter++
+			}
+		}
 
 		if doSingle {
 			do = false
@@ -44,26 +58,11 @@ func getNodeCoords(node1 []int, node2 []int, doSingle bool) [][]int {
 		}
 	}
 
-	return result
+	return counter
 }
 
 func nodeInBounds(node []int, grid [][]string) bool {
 	return node[0] >= 0 && node[0] < len(grid[0]) && node[1] >= 0 && node[1] < len(grid)
-}
-
-func addNodeToGrid(grid [][]string, nodes [][]int, key string) int {
-	counter := 0
-
-	for _, node := range nodes {
-		if nodeInBounds(node, grid) {
-			if grid[node[1]][node[0]] != "#" && grid[node[1]][node[0]] != key {
-				grid[node[1]][node[0]] = "#"
-				counter++
-			}
-		}
-	}
-
-	return counter
 }
 
 func resetGrid(grid [][]string, original [][]string) [][]string {
@@ -108,10 +107,7 @@ func createAntiNodes(grid [][]string) {
 		for i := 0; i < len(letterValues); i++ {
 			for j := 0; j < len(letterValues); j++ {
 				if i != j {
-					coords := getNodeCoords(letterValues[i], letterValues[j], false)
-
-					newNodes := addNodeToGrid(gridWithNodes, coords, key)
-					count += newNodes
+					count += getNodeCoords(&gridWithNodes, letterValues[i], letterValues[j], true, key)
 				}
 			}
 		}
@@ -121,7 +117,7 @@ func createAntiNodes(grid [][]string) {
 
 	// fmt.Println(nodeMap)
 	fmt.Println("Count:", count)
-	utils.PrintGrid(gridWithNodes)
+	// utils.PrintGrid(gridWithNodes)
 }
 
 func Solve() {
