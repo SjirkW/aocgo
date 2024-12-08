@@ -97,27 +97,29 @@ func createAntiNodes(grid [][]string) {
 	count := 0
 	for key, letterValues := range nodeMap {
 		gridWithNodes = resetGrid(gridWithNodes, originalGrid)
-		fmt.Println("Key:", key)
+		// fmt.Println("Key:", key)
+
 		for i := 0; i < len(letterValues); i++ {
 			for j := 0; j < len(letterValues); j++ {
 				if i != j {
 					coords := getNodeCoords(letterValues[i], letterValues[j])
 
-					count += addNodeToGrid(gridWithNodes, coords, key)
+					newNodes := addNodeToGrid(gridWithNodes, coords, key)
+					count += newNodes
 				}
 			}
 		}
 
-		utils.PrintGrid(gridWithNodes)
+		// utils.PrintGrid(gridWithNodes)
 	}
 
-	fmt.Println(nodeMap)
+	// fmt.Println(nodeMap)
 	fmt.Println("Count:", count)
-	// utils.PrintGrid(grid)
+	utils.PrintGrid(gridWithNodes)
 }
 
 func Solve() {
-	lines := utils.ReadInputAsLines(8, false)
+	lines := utils.ReadInputAsLines(8, true)
 
 	var grid [][]string
 	for _, line := range lines {
