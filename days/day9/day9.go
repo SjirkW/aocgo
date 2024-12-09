@@ -104,7 +104,6 @@ func Solve() {
 			continue
 		}
 
-		// Find empty space
 		smallestIndex := 9999999
 		size := -1
 		for _, key := range keys {
@@ -141,6 +140,5 @@ func Solve() {
 		}
 	}
 
-	// fmt.Println("Part 2:", pt2Blocks)
 	fmt.Println("Part 2:", getResult(pt2Blocks))
 }
