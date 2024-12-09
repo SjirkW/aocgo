@@ -3,6 +3,7 @@ package day9
 import (
 	"aoc/utils"
 	"fmt"
+	"sort"
 )
 
 func getResult(blocks []int) int {
@@ -27,7 +28,11 @@ func Solve() {
 
 	var blocks []int
 	blockSizes := make(map[int]int)
-	emptySizes := make(map[int]int)
+
+	var emptySpaces []struct {
+		index int
+		size  int
+	}
 	for _, char := range line {
 		count := utils.StringToInt(string(char))
 
@@ -36,7 +41,10 @@ func Solve() {
 				blocks = append(blocks, idCounter)
 			} else {
 				if i == 0 {
-					emptySizes[len(blocks)] = count
+					emptySpaces = append(emptySpaces, struct {
+						index int
+						size  int
+					}{len(blocks), count})
 				}
 				blocks = append(blocks, -1)
 			}
@@ -49,6 +57,10 @@ func Solve() {
 		}
 		isBlock = !isBlock
 	}
+
+	sort.Slice(emptySpaces, func(i, j int) bool {
+		return emptySpaces[i].index < emptySpaces[j].index
+	})
 
 	// fmt.Println(blocks)
 
@@ -91,17 +103,18 @@ func Solve() {
 		if id == -1 {
 			continue
 		}
-		for j := 0; j < i; j++ {
-			if (pt2Blocks[j] == -1) &&
-				(emptySizes[j] > 0 && emptySizes[j] >= length) {
+
+		for spaceIx, emptySpace := range emptySpaces {
+			if emptySpace.index < i && emptySpace.size >= length {
+				// Move block to the empty space
 				for x := 0; x < length; x++ {
-					pt2Blocks[j+x] = id
+					pt2Blocks[emptySpace.index+x] = id
 					pt2Blocks[i-x] = -1
 				}
 
-				oldSize := emptySizes[j]
-				delete(emptySizes, j)
-				emptySizes[j+length] = oldSize - length
+				emptySpaces[spaceIx].size -= length
+				emptySpaces[spaceIx].index += length
+
 				break
 			}
 		}
