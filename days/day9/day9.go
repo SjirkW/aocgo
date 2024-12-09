@@ -30,6 +30,8 @@ func Solve() {
 		index int
 		size  int
 	}
+
+	emptySpacesMap := make(map[int][]int)
 	for _, char := range line {
 		count := utils.StringToInt(string(char))
 
@@ -38,10 +40,7 @@ func Solve() {
 				blocks = append(blocks, idCounter)
 			} else {
 				if i == 0 {
-					emptySpaces = append(emptySpaces, struct {
-						index int
-						size  int
-					}{len(blocks), count})
+					emptySpacesMap[count] = append(emptySpacesMap[count], len(blocks))
 				}
 				blocks = append(blocks, -1)
 			}
@@ -91,6 +90,12 @@ func Solve() {
 
 	fmt.Println("Part 1:", getResult(blocks))
 
+	keys := make([]int, 0, len(emptySpacesMap))
+	for key := range emptySpacesMap {
+		keys = append(keys, key)
+	}
+	sort.Ints(keys) // Sort the keys in ascending order
+
 	for i := len(pt2Blocks) - 1; i >= 0; i-- {
 		id := pt2Blocks[i]
 		length := blockSizes[id]
@@ -99,21 +104,43 @@ func Solve() {
 			continue
 		}
 
-		for spaceIx, emptySpace := range emptySpaces {
-			if emptySpace.index < i && emptySpace.size >= length {
-				// Move block to the empty space
-				for x := 0; x < length; x++ {
-					pt2Blocks[emptySpace.index+x] = id
-					pt2Blocks[i-x] = -1
-				}
-				i -= length - 1
+		// Find empty space
+		smallestIndex := 9999999
+		size := -1
+		for _, key := range keys {
+			if key >= length && len(emptySpacesMap[key]) > 0 && emptySpacesMap[key][0] < smallestIndex {
+				size = key
+				smallestIndex = emptySpacesMap[key][0]
+			}
+		}
 
-				emptySpaces[spaceIx].size -= length
-				emptySpaces[spaceIx].index += length
-				break
+		if size == -1 {
+			continue
+		}
+
+		indexes := emptySpacesMap[size]
+		index := indexes[0]
+		if index < i {
+			for x := 0; x < length; x++ {
+				pt2Blocks[index+x] = id
+				pt2Blocks[i-x] = -1
+			}
+
+			emptySpacesMap[size] = indexes[1:]
+			newSize := size - length
+			newIndex := index + length
+			if newSize > 0 {
+				arrayToAdd := emptySpacesMap[newSize]
+				for x := 0; x < len(arrayToAdd); x++ {
+					if newIndex < arrayToAdd[x] {
+						emptySpacesMap[newSize] = append(arrayToAdd[:x], append([]int{newIndex}, arrayToAdd[x:]...)...)
+						break
+					}
+				}
 			}
 		}
 	}
 
+	// fmt.Println("Part 2:", pt2Blocks)
 	fmt.Println("Part 2:", getResult(pt2Blocks))
 }
