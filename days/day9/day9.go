@@ -20,9 +20,6 @@ func getResult(blocks []int) int {
 func Solve() {
 	lines := utils.ReadInputAsLines(9, false)
 	line := lines[0]
-
-	// fmt.Println(line)
-
 	idCounter := 0
 	isBlock := true
 
@@ -62,11 +59,9 @@ func Solve() {
 		return emptySpaces[i].index < emptySpaces[j].index
 	})
 
-	// fmt.Println(blocks)
-
 	// Loop backwards
 	firstEmpty := -1
-	for i, _ := range blocks {
+	for i := range blocks {
 		if blocks[i] == -1 {
 			firstEmpty = i
 			break
@@ -111,10 +106,10 @@ func Solve() {
 					pt2Blocks[emptySpace.index+x] = id
 					pt2Blocks[i-x] = -1
 				}
+				i -= length - 1
 
 				emptySpaces[spaceIx].size -= length
 				emptySpaces[spaceIx].index += length
-
 				break
 			}
 		}
