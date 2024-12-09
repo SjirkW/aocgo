@@ -3,7 +3,6 @@ package day9
 import (
 	"aoc/utils"
 	"fmt"
-	"sort"
 )
 
 func getResult(blocks []int) int {
@@ -17,49 +16,9 @@ func getResult(blocks []int) int {
 	return result
 }
 
-func Solve() {
-	lines := utils.ReadInputAsLines(9, false)
-	line := lines[0]
-	idCounter := 0
-	isBlock := true
-
-	var blocks []int
-	blockSizes := make(map[int]int)
-
-	var emptySpaces []struct {
-		index int
-		size  int
-	}
-
-	emptySpacesMap := make(map[int][]int)
-	for _, char := range line {
-		count := utils.StringToInt(string(char))
-
-		for i := 0; i < count; i++ {
-			if isBlock {
-				blocks = append(blocks, idCounter)
-			} else {
-				if i == 0 {
-					emptySpacesMap[count] = append(emptySpacesMap[count], len(blocks))
-				}
-				blocks = append(blocks, -1)
-			}
-		}
-
-		if isBlock {
-			blockSizes[idCounter] = count
-		} else {
-			idCounter++
-		}
-		isBlock = !isBlock
-	}
-
-	sort.Slice(emptySpaces, func(i, j int) bool {
-		return emptySpaces[i].index < emptySpaces[j].index
-	})
-
-	// Loop backwards
+func pt1(blocks []int) {
 	firstEmpty := -1
+	// Find the first empty space
 	for i := range blocks {
 		if blocks[i] == -1 {
 			firstEmpty = i
@@ -67,15 +26,12 @@ func Solve() {
 		}
 	}
 
-	// copy blocks to blocks2
-	pt2Blocks := make([]int, len(blocks))
-	copy(pt2Blocks, blocks)
-
+	// Loop from the end of the list and add keys to the empty spaces in front
 	for i := len(blocks) - 1; i >= 0; i-- {
 		blocks[firstEmpty] = blocks[i]
 		blocks[i] = -1
 
-		// Find next empty
+		// Find next empty space
 		for x := firstEmpty; x < len(blocks); x++ {
 			if blocks[x] == -1 {
 				firstEmpty = x
@@ -90,13 +46,15 @@ func Solve() {
 
 	fmt.Println("\nDay 9")
 	fmt.Println("Part 1:", getResult(blocks))
+}
 
+func pt2(pt2Blocks []int, blockSizes map[int]int, emptySpacesMap map[int][]int) {
 	keys := make([]int, 0, len(emptySpacesMap))
 	for key := range emptySpacesMap {
 		keys = append(keys, key)
 	}
-	sort.Ints(keys) // Sort the keys in ascending order
 
+	// Loop from the end of the list and add keys to the empty spaces in front
 	for i := len(pt2Blocks) - 1; i >= 0; i-- {
 		id := pt2Blocks[i]
 		length := blockSizes[id]
@@ -105,6 +63,7 @@ func Solve() {
 			continue
 		}
 
+		// Find the lowest possible index to add
 		smallestIndex := 9999999
 		size := -1
 		for _, key := range keys {
@@ -118,14 +77,17 @@ func Solve() {
 			continue
 		}
 
+		// Get the correct index
 		indexes := emptySpacesMap[size]
 		index := indexes[0]
 		if index < i {
+			// Overwrite empty blocks and remove old ids
 			for x := 0; x < length; x++ {
 				pt2Blocks[index+x] = id
 				pt2Blocks[i-x] = -1
 			}
 
+			// Remove the old size and add a new one
 			emptySpacesMap[size] = indexes[1:]
 			newSize := size - length
 			newIndex := index + length
@@ -142,4 +104,43 @@ func Solve() {
 	}
 
 	fmt.Println("Part 2:", getResult(pt2Blocks))
+}
+
+func Solve() {
+	lines := utils.ReadInputAsLines(9, false)
+	line := lines[0]
+	idCounter := 0
+	isBlock := true
+
+	var blocks []int
+	var blocks2 []int
+	blockSizes := make(map[int]int)
+	emptySpacesMap := make(map[int][]int)
+
+	for _, char := range line {
+		count := utils.StringToInt(string(char))
+
+		for i := 0; i < count; i++ {
+			if isBlock {
+				blocks = append(blocks, idCounter)
+				blocks2 = append(blocks2, idCounter)
+			} else {
+				if i == 0 {
+					emptySpacesMap[count] = append(emptySpacesMap[count], len(blocks))
+				}
+				blocks = append(blocks, -1)
+				blocks2 = append(blocks2, -1)
+			}
+		}
+
+		if isBlock {
+			blockSizes[idCounter] = count
+		} else {
+			idCounter++
+		}
+		isBlock = !isBlock
+	}
+
+	pt1(blocks)
+	pt2(blocks2, blockSizes, emptySpacesMap)
 }
