@@ -17,7 +17,7 @@ func getResult(blocks []int) int {
 }
 
 func Solve() {
-	lines := utils.ReadInputAsLines(9, true)
+	lines := utils.ReadInputAsLines(9, false)
 	line := lines[0]
 
 	// fmt.Println(line)
@@ -92,7 +92,7 @@ func Solve() {
 			continue
 		}
 		for j := 0; j < len(pt2Blocks); j++ {
-			if (pt2Blocks[j] == -1) &&
+			if (i > j && pt2Blocks[j] == -1) &&
 				(emptySizes[j] > 0 && emptySizes[j] >= length) {
 				for x := 0; x < length; x++ {
 					pt2Blocks[j+x] = id
@@ -107,8 +107,5 @@ func Solve() {
 		}
 	}
 
-	fmt.Println("Part 2:", pt2Blocks)
 	fmt.Println("Part 2:", getResult(pt2Blocks))
-	// fmt.Println(blockSizes)
-	// fmt.Println(pt2Blocks)
 }
