@@ -114,9 +114,10 @@ func Solve() {
 
 	var blocks []int
 	var blocks2 []int
+	// A map of existing blocks and their sizes in the array
 	blockSizes := make(map[int]int)
+	// A map of empty spaces and their indexes in the array, grouped by size
 	emptySpacesMap := make(map[int][]int)
-
 	for _, char := range line {
 		count := utils.StringToInt(string(char))
 
