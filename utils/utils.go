@@ -3,6 +3,7 @@ package utils
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strconv"
@@ -18,18 +19,26 @@ func ReadInputAsLines(day int, isTest bool) []string {
 	}
 
 	file, err := os.Open(path)
-
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
+	reader := bufio.NewReader(file)
 	var lines []string
 
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
+	for {
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			if err == io.EOF {
+				if len(line) > 0 {
+					lines = append(lines, strings.TrimRight(line, "\r\n"))
+				}
+				break
+			}
+			log.Fatal(err)
+		}
+		lines = append(lines, strings.TrimRight(line, "\r\n"))
 	}
 
 	return lines
