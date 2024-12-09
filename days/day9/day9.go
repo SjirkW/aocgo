@@ -88,6 +88,7 @@ func Solve() {
 		}
 	}
 
+	fmt.Println("\nDay 9")
 	fmt.Println("Part 1:", getResult(blocks))
 
 	keys := make([]int, 0, len(emptySpacesMap))
