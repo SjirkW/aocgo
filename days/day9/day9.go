@@ -91,8 +91,8 @@ func Solve() {
 		if id == -1 {
 			continue
 		}
-		for j := 0; j < len(pt2Blocks); j++ {
-			if (i > j && pt2Blocks[j] == -1) &&
+		for j := 0; j < i; j++ {
+			if (pt2Blocks[j] == -1) &&
 				(emptySizes[j] > 0 && emptySizes[j] >= length) {
 				for x := 0; x < length; x++ {
 					pt2Blocks[j+x] = id
