@@ -20,6 +20,8 @@ var directions = []Point{
 func FindTrialAmount(grid [][]int, point Point) int {
 	result := 0
 	pointsToCheck := make([]Point, 0)
+	endPointMap := make(map[Point]bool)
+
 	for _, dir := range directions {
 		x := point.x + dir.x
 		y := point.y + dir.y
@@ -28,7 +30,11 @@ func FindTrialAmount(grid [][]int, point Point) int {
 			continue
 		}
 
-		pointsToCheck = append(pointsToCheck, Point{point.x + dir.x, point.y + dir.y})
+		nextVal := grid[y][x]
+
+		if nextVal == 1 {
+			pointsToCheck = append(pointsToCheck, Point{point.x + dir.x, point.y + dir.y})
+		}
 	}
 
 	for len(pointsToCheck) > 0 {
@@ -43,10 +49,13 @@ func FindTrialAmount(grid [][]int, point Point) int {
 				continue
 			}
 
-			if grid[y][x] == 9 {
-				result++
-			} else if grid[y][x] == score+1 {
-				pointsToCheck = append(pointsToCheck, Point{x, y})
+			if grid[y][x] == score+1 {
+				if grid[y][x] == 9 && !endPointMap[Point{x, y}] {
+					endPointMap[Point{x, y}] = true
+					result++
+				} else {
+					pointsToCheck = append(pointsToCheck, Point{x, y})
+				}
 			}
 		}
 	}
@@ -69,20 +78,26 @@ func Part1(grid [][]int) {
 
 	result := 0
 	for _, point := range startingPoints {
-		result += FindTrialAmount(grid, point)
+		amount := FindTrialAmount(grid, point)
+		// fmt.Println(amount, point)
+		result += amount
 	}
 
 	fmt.Println(result)
 }
 
 func Solve() {
-	lines := utils.ReadInputAsLines(10, true)
+	lines := utils.ReadInputAsLines(10, false)
 
 	grid := make([][]int, 0)
 	for _, line := range lines {
 		row := make([]int, 0)
 		for _, char := range line {
-			row = append(row, utils.StringToInt(string(char)))
+			if char == '.' {
+				row = append(row, -1)
+			} else {
+				row = append(row, utils.StringToInt(string(char)))
+			}
 		}
 		grid = append(grid, row)
 
