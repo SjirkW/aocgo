@@ -17,8 +17,9 @@ var directions = []Point{
 	{-1, 0},
 }
 
-func FindTrialAmount(grid [][]int, point Point) int {
-	result := 0
+func FindTrialAmount(grid [][]int, point Point) []int {
+	result1 := 0
+	result2 := 0
 	pointsToCheck := make([]Point, 0)
 	endPointMap := make(map[Point]bool)
 
@@ -51,8 +52,11 @@ func FindTrialAmount(grid [][]int, point Point) int {
 
 			if grid[y][x] == score+1 {
 				if grid[y][x] == 9 {
-					endPointMap[Point{x, y}] = true
-					result++
+					if (!endPointMap[Point{x, y}]) {
+						result1++
+						endPointMap[Point{x, y}] = true
+					}
+					result2++
 				} else {
 					pointsToCheck = append(pointsToCheck, Point{x, y})
 				}
@@ -60,10 +64,10 @@ func FindTrialAmount(grid [][]int, point Point) int {
 		}
 	}
 
-	return result
+	return []int{result1, result2}
 }
 
-func Part1(grid [][]int) {
+func Part1And2(grid [][]int) {
 	var startingPoints []Point
 
 	for y, row := range grid {
@@ -74,16 +78,18 @@ func Part1(grid [][]int) {
 		}
 	}
 
-	fmt.Println(startingPoints)
-
-	result := 0
+	result1 := 0
+	result2 := 0
 	for _, point := range startingPoints {
-		amount := FindTrialAmount(grid, point)
+		amounts := FindTrialAmount(grid, point)
 		// fmt.Println(amount, point)
-		result += amount
+		result1 += amounts[0]
+		result2 += amounts[1]
 	}
 
-	fmt.Println(result)
+	fmt.Println("\nDay10")
+	fmt.Println("Part 1", result1)
+	fmt.Println("Part 2", result2)
 }
 
 func Solve() {
@@ -103,7 +109,5 @@ func Solve() {
 
 	}
 
-	Part1(grid)
-
-	// utils.PrintIntGrid(grid)
+	Part1And2(grid)
 }
