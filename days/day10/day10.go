@@ -50,7 +50,7 @@ func FindTrialAmount(grid [][]int, point Point) int {
 			}
 
 			if grid[y][x] == score+1 {
-				if grid[y][x] == 9 && !endPointMap[Point{x, y}] {
+				if grid[y][x] == 9 {
 					endPointMap[Point{x, y}] = true
 					result++
 				} else {
