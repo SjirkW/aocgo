@@ -67,6 +67,17 @@ func PrintGrid(grid [][]string) {
 	fmt.Println()
 }
 
+func PrintIntGrid(grid [][]int) {
+	fmt.Println()
+	for _, row := range grid {
+		for _, col := range row {
+			fmt.Print(col)
+		}
+		fmt.Println()
+	}
+	fmt.Println()
+}
+
 func StringToIntArray(input string, splitChar string) []int {
 	// Split the string on spaces
 	strValues := strings.Split(input, splitChar)
