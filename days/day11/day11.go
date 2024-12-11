@@ -17,8 +17,11 @@ func GetDigitAmount(number int) int {
 }
 
 func DoLoop(numbers []int) {
-	blinks := 25
+	blinks := 75
 
+	// prev := len(numbers)
+
+	// lengths := make([]int, 0)
 	for i := 0; i < blinks; i++ {
 		// empty array
 		newNumbers := make([]int, 0)
@@ -42,7 +45,14 @@ func DoLoop(numbers []int) {
 			}
 		}
 
+		// div := math.Log(float64(len(newNumbers))) - math.Log(float64(prev))
+		// fmt.Println("increase", div)
+		// prev = len(newNumbers)
 		numbers = newNumbers
+		fmt.Println(i+1, len(numbers))
+		// l := len(numbers)
+		// lengths = append(lengths, l)
+		// fmt.Println(lengths)
 	}
 
 	fmt.Println("\nDay 11")

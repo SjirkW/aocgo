@@ -56,7 +56,7 @@ func traverseGrid(gridData *GridData, pt1 bool, dir int, start []int, obstacle [
 			y = nextY
 
 			if !pt1 {
-				visitedKey := (x << 24) | (y << 16) | (dx << 8) | dy
+				visitedKey := (x << 24) | (y << 16) | ((dx + 2) << 8) | (dy + 2)
 				if visited[visitedKey] {
 					return true
 				}
@@ -125,7 +125,6 @@ func Solve() {
 		obstacles: make(map[string]int),
 	}
 
-	fmt.Println("\nDay 6")
 	traverseGrid(&gridData, true, 0, start, []int{-1, -1})
 	// Use the result from part 1 to solve part 2
 	part2(&gridData, start)
