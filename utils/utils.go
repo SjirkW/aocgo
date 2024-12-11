@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -65,6 +66,16 @@ func PrintGrid(grid [][]string) {
 		fmt.Println()
 	}
 	fmt.Println()
+}
+
+func DigitCount(n int) int {
+	if n == 0 {
+		return 1
+	}
+	if n < 0 {
+		n = -n
+	}
+	return int(math.Log10(float64(n))) + 1
 }
 
 func PrintIntGrid(grid [][]int) {
