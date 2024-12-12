@@ -27,24 +27,18 @@ type GridData struct {
 var gridWidth = 131
 
 func traverseGrid(gridData *GridData, pt1 bool, dir int, start []int, obstacle []int) bool {
-	x := start[0]
-	y := start[1]
+	x, y := start[0], start[1]
 	direction := dir
 	grid := gridData.grid
 	score := gridData.score
-	next := true
-	counter := 0
-	visited := make([]bool, gridWidth*gridWidth*len(directions))
+	gridWidth, gridHeight := len(grid[0]), len(grid)
+	visited := make([]bool, gridWidth*gridHeight*4)
 
-	for next {
-		counter++
-		dx := directions[direction][0]
-		dy := directions[direction][1]
-		nextX := x + dx
-		nextY := y + dy
+	for {
+		dx, dy := directions[direction][0], directions[direction][1]
+		nextX, nextY := x+dx, y+dy
 
-		if (nextX < 0 || nextX >= len(grid)) ||
-			(nextY < 0 || nextY >= len(grid[0])) {
+		if nextX < 0 || nextX >= gridWidth || nextY < 0 || nextY >= gridHeight {
 			if pt1 {
 				fmt.Println("Part 1:", score)
 			}
@@ -54,40 +48,37 @@ func traverseGrid(gridData *GridData, pt1 bool, dir int, start []int, obstacle [
 		next := grid[nextY][nextX]
 		isObstacle := obstacle[0] == nextX && obstacle[1] == nextY
 		if !isObstacle && (next == "." || next == "^" || next == "X") {
-			x = nextX
-			y = nextY
-
+			x, y = nextX, nextY
 			if !pt1 {
-				visitedKey := (y*gridWidth+x)*len(directions) + direction
-				if visited[visitedKey] {
+				key := (y*gridWidth+x)*4 + direction
+				if visited[key] {
 					return true
 				}
-				visited[visitedKey] = true
+				visited[key] = true
 			} else if next != "X" {
 				score++
 				grid[nextY][nextX] = "X"
 			}
 		} else if next == "#" || isObstacle {
-			direction = (direction + 1) % len(directions)
+			direction = (direction + 1) % 4
 		}
 	}
-	return false
 }
 
 func part2(gridData *GridData, start []int) {
 	var loop int32
 	var wg sync.WaitGroup
-	semaphore := make(chan struct{}, runtime.NumCPU())
+	workerPool := make(chan struct{}, runtime.NumCPU())
 
 	for i := 0; i < len(gridData.grid); i++ {
 		for j := 0; j < len(gridData.grid[i]); j++ {
 			if gridData.grid[i][j] == "X" {
 				wg.Add(1)
-				semaphore <- struct{}{}
+				workerPool <- struct{}{}
 
 				go func(x, y int) {
 					defer wg.Done()
-					defer func() { <-semaphore }()
+					defer func() { <-workerPool }()
 
 					if traverseGrid(gridData, false, 0, start, []int{x, y}) {
 						atomic.AddInt32(&loop, 1)
