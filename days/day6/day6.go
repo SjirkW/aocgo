@@ -26,7 +26,7 @@ type GridData struct {
 
 var gridWidth = 131
 
-func traverseGrid(gridData *GridData, pt1 bool, dir int, start []int, obstacle []int) bool {
+func traverseGrid(gridData *GridData, findLoop bool, dir int, start []int, obstacle []int) bool {
 	x, y := start[0], start[1]
 	direction := dir
 	grid := gridData.grid
@@ -39,7 +39,7 @@ func traverseGrid(gridData *GridData, pt1 bool, dir int, start []int, obstacle [
 		nextX, nextY := x+dx, y+dy
 
 		if nextX < 0 || nextX >= gridWidth || nextY < 0 || nextY >= gridHeight {
-			if pt1 {
+			if !findLoop {
 				fmt.Println("Part 1:", score)
 			}
 			return false
@@ -47,9 +47,11 @@ func traverseGrid(gridData *GridData, pt1 bool, dir int, start []int, obstacle [
 
 		next := grid[nextY][nextX]
 		isObstacle := obstacle[0] == nextX && obstacle[1] == nextY
-		if !isObstacle && (next == "." || next == "^" || next == "X") {
+
+		if !isObstacle && next != "#" {
 			x, y = nextX, nextY
-			if !pt1 {
+
+			if findLoop {
 				key := (y*gridWidth+x)*4 + direction
 				if visited[key] {
 					return true
@@ -59,7 +61,7 @@ func traverseGrid(gridData *GridData, pt1 bool, dir int, start []int, obstacle [
 				score++
 				grid[nextY][nextX] = "X"
 			}
-		} else if next == "#" || isObstacle {
+		} else {
 			direction = (direction + 1) % 4
 		}
 	}
@@ -80,7 +82,7 @@ func part2(gridData *GridData, start []int) {
 					defer wg.Done()
 					defer func() { <-workerPool }()
 
-					if traverseGrid(gridData, false, 0, start, []int{x, y}) {
+					if traverseGrid(gridData, true, 0, start, []int{x, y}) {
 						atomic.AddInt32(&loop, 1)
 					}
 				}(j, i)
@@ -118,7 +120,6 @@ func Solve() {
 		obstacles: make(map[string]int),
 	}
 
-	traverseGrid(&gridData, true, 0, start, []int{-1, -1})
-	// Use the result from part 1 to solve part 2
+	traverseGrid(&gridData, false, 0, start, []int{-1, -1})
 	part2(&gridData, start)
 }
