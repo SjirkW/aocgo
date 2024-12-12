@@ -24,6 +24,8 @@ type GridData struct {
 	obstacles map[string]int
 }
 
+var gridWidth = 131
+
 func traverseGrid(gridData *GridData, pt1 bool, dir int, start []int, obstacle []int) bool {
 	x := start[0]
 	y := start[1]
@@ -32,7 +34,7 @@ func traverseGrid(gridData *GridData, pt1 bool, dir int, start []int, obstacle [
 	score := gridData.score
 	next := true
 	counter := 0
-	visited := make(map[int]bool)
+	visited := make([]bool, 131*131*len(directions))
 
 	for next {
 		counter++
@@ -56,7 +58,7 @@ func traverseGrid(gridData *GridData, pt1 bool, dir int, start []int, obstacle [
 			y = nextY
 
 			if !pt1 {
-				visitedKey := (x << 24) | (y << 16) | ((dx + 2) << 8) | (dy + 2)
+				visitedKey := (y*131+x)*len(directions) + direction
 				if visited[visitedKey] {
 					return true
 				}
