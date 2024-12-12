@@ -10,21 +10,26 @@ import (
 )
 
 var directions = [][]int{
-	{0, -1},
-	{1, 0},
-	{0, 1},
-	{-1, 0},
+	{0, -1}, // up
+	{1, 0},  // right
+	{0, 1},  // down
+	{-1, 0}, // left
 }
 
 type GridData struct {
-	grid      [][]string
-	position  []int
-	direction []int
-	score     int
-	obstacles map[string]int
+	grid       [][]string
+	position   []int
+	direction  []int
+	score      int
+	obstacles  map[string]int
+	directions map[int]int
 }
 
 var gridWidth = 131
+
+func getKey(x, y int) int {
+	return x<<16 | y
+}
 
 func traverseGrid(gridData *GridData, findLoop bool, dir int, start []int, obstacle []int) bool {
 	x, y := start[0], start[1]
@@ -60,6 +65,7 @@ func traverseGrid(gridData *GridData, findLoop bool, dir int, start []int, obsta
 			} else if next != "X" {
 				score++
 				grid[nextY][nextX] = "X"
+				gridData.directions[getKey(x, y)] = direction
 			}
 		} else {
 			direction = (direction + 1) % 4
@@ -82,7 +88,18 @@ func part2(gridData *GridData, start []int) {
 					defer wg.Done()
 					defer func() { <-workerPool }()
 
-					if traverseGrid(gridData, true, 0, start, []int{x, y}) {
+					dir := gridData.directions[getKey(x, y)]
+					start := []int{x, y}
+					if dir == 0 {
+						start[1]++
+					} else if dir == 1 {
+						start[0]--
+					} else if dir == 2 {
+						start[1]--
+					} else if dir == 3 {
+						start[0]++
+					}
+					if traverseGrid(gridData, true, dir, start, []int{x, y}) {
 						atomic.AddInt32(&loop, 1)
 					}
 				}(j, i)
@@ -113,11 +130,12 @@ func Solve() {
 	}
 
 	gridData := GridData{
-		grid:      grid,
-		position:  start,
-		direction: directions[0],
-		score:     1,
-		obstacles: make(map[string]int),
+		grid:       grid,
+		position:   start,
+		direction:  directions[0],
+		score:      1,
+		obstacles:  make(map[string]int),
+		directions: make(map[int]int),
 	}
 
 	traverseGrid(&gridData, false, 0, start, []int{-1, -1})
