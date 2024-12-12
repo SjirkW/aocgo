@@ -34,7 +34,7 @@ func traverseGrid(gridData *GridData, pt1 bool, dir int, start []int, obstacle [
 	score := gridData.score
 	next := true
 	counter := 0
-	visited := make([]bool, 131*131*len(directions))
+	visited := make([]bool, gridWidth*gridWidth*len(directions))
 
 	for next {
 		counter++
@@ -58,7 +58,7 @@ func traverseGrid(gridData *GridData, pt1 bool, dir int, start []int, obstacle [
 			y = nextY
 
 			if !pt1 {
-				visitedKey := (y*131+x)*len(directions) + direction
+				visitedKey := (y*gridWidth+x)*len(directions) + direction
 				if visited[visitedKey] {
 					return true
 				}
