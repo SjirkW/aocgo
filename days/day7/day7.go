@@ -4,7 +4,9 @@ import (
 	"aoc/utils"
 	"fmt"
 	"math"
+	"runtime"
 	"strings"
+	"sync"
 )
 
 func concatInts(a int, b int) int {
@@ -49,16 +51,45 @@ func Solve() {
 		right = append(right, utils.StringToIntArray(split[1], " "))
 	}
 
-	pt1 := 0
-	pt2 := 0
-	for i := 0; i < len(left); i++ {
-		if hasResult(left[i], 0, right[i], false) {
-			pt1 += left[i]
+	numWorkers := runtime.NumCPU()
+	chunkSize := (len(left) + numWorkers - 1) / numWorkers
+
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+
+	var pt1 int
+	var pt2 int
+	for w := 0; w < numWorkers; w++ {
+		start := w * chunkSize
+		end := start + chunkSize
+		if end > len(left) {
+			end = len(left)
 		}
-		if hasResult(left[i], 0, right[i], true) {
-			pt2 += left[i]
-		}
+
+		wg.Add(1)
+		go func(start, end int) {
+			defer wg.Done()
+
+			localPt1 := 0
+			localPt2 := 0
+
+			for i := start; i < end; i++ {
+				if hasResult(left[i], 0, right[i], false) {
+					localPt1 += left[i]
+				}
+				if hasResult(left[i], 0, right[i], true) {
+					localPt2 += left[i]
+				}
+			}
+
+			mu.Lock()
+			pt1 += localPt1
+			pt2 += localPt2
+			mu.Unlock()
+		}(start, end)
 	}
+
+	wg.Wait()
 
 	fmt.Println("\nDay 7")
 	fmt.Println("Part 1:", pt1)
