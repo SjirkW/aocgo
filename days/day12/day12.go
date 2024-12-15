@@ -9,6 +9,28 @@ import (
 type FloodFillResult struct {
 	Area      int
 	Perimeter int
+	Corners   int
+}
+
+func CountCorners(grid [][]string, x int, y int, result *FloodFillResult) {
+	current := strings.ToLower(grid[y][x])
+
+	hasTopLeftCorner := (y == 0 || strings.ToLower(grid[y-1][x]) != current) && (x == 0 || strings.ToLower(grid[y][x-1]) != current)
+	if hasTopLeftCorner {
+		result.Corners++
+	}
+	hasTopRightCorner := (y == 0 || strings.ToLower(grid[y-1][x]) != current) && (x == len(grid)-1 || strings.ToLower(grid[y][x+1]) != current)
+	if hasTopRightCorner {
+		result.Corners++
+	}
+	hasBottomLeftCorner := (y == len(grid[0])-1 || strings.ToLower(grid[y+1][x]) != current) && (x == 0 || strings.ToLower(grid[y][x-1]) != current)
+	if hasBottomLeftCorner {
+		result.Corners++
+	}
+	hasBottomRightCorner := (y == len(grid[0])-1 || strings.ToLower(grid[y+1][x]) != current) && (x == len(grid)-1 || strings.ToLower(grid[y][x+1]) != current)
+	if hasBottomRightCorner {
+		result.Corners++
+	}
 }
 
 func FloodFill(grid [][]string, x int, y int, fill string, result *FloodFillResult) {
@@ -26,6 +48,7 @@ func FloodFill(grid [][]string, x int, y int, fill string, result *FloodFillResu
 
 	// Mark the cell as visited
 	grid[y][x] = strings.ToLower(fill)
+	CountCorners(grid, x, y, result)
 
 	// Increment the count
 	result.Area++
@@ -38,7 +61,7 @@ func FloodFill(grid [][]string, x int, y int, fill string, result *FloodFillResu
 }
 
 func Solve() {
-	lines := utils.ReadInputAsLines(12, false)
+	lines := utils.ReadInputAsLines(12, true)
 
 	grid := make([][]string, len(lines))
 	for i, line := range lines {
@@ -51,10 +74,10 @@ func Solve() {
 	total := 0
 	for y, row := range grid {
 		for x, _ := range row {
-			result := &FloodFillResult{Area: 0, Perimeter: 0}
+			result := &FloodFillResult{Area: 0, Perimeter: 0, Corners: 0}
 			FloodFill(grid, x, y, grid[y][x], result)
 			if result.Area > 0 {
-				fmt.Println(result.Area, result.Perimeter)
+				fmt.Println(grid[y][x], result.Area, result.Perimeter, result.Corners)
 				total += result.Area * result.Perimeter
 			}
 		}
