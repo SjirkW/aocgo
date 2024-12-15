@@ -45,6 +45,7 @@ func traverseGrid(gridData *GridData, findLoop bool, dir int, start []int, obsta
 
 		if nextX < 0 || nextX >= gridWidth || nextY < 0 || nextY >= gridHeight {
 			if !findLoop {
+				fmt.Println("\nDay6: ")
 				fmt.Println("Part 1:", score)
 			}
 			return false
