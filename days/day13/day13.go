@@ -12,10 +12,11 @@ type Point struct {
 }
 
 type Game struct {
-	ButtonA Point
-	ButtonB Point
-	Goal    Point
-	Steps   int
+	ButtonA   Point
+	ButtonB   Point
+	Goal      Point
+	Steps     int
+	isSwapped bool
 }
 
 func parsePoint(line string, delimiter string) Point {
@@ -59,12 +60,15 @@ func hasResult(game *Game, startX int) (int, int) {
 	return -1, -1
 }
 
-func getMinScorePossible(game Game) {
+func getMinScorePossible(game Game) int {
 	resA, resB := hasResult(&game, game.Goal.X/game.ButtonA.X)
 	if resA != -1 {
-		fmt.Println("Part 1:", resA, resB)
+		return resA*3 + resB
 	}
+
+	return 0
 }
+
 func Solve() {
 	lines := utils.ReadInputAsLines(13, true)
 
@@ -96,18 +100,14 @@ func Solve() {
 		} else if strings.HasPrefix(line, "Prize: ") {
 			game.Goal = parsePoint(strings.Split(line, "Prize: ")[1], "=")
 
-			if game.ButtonB.X > game.ButtonA.X {
-				temp := game.ButtonA
-				game.ButtonA = game.ButtonB
-				game.ButtonB = temp
-			}
 			gamesToPlay = append(gamesToPlay, game)
 		}
 	}
 
+	total := 0
 	for _, game := range gamesToPlay {
-		getMinScorePossible(game)
+		total += getMinScorePossible(game)
 	}
 
-	fmt.Println("Games to play:", len(gamesToPlay))
+	fmt.Println(total)
 }
